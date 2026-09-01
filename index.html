@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description"
+    content="Analisador de ondas sonoras em tempo real — ferramenta educacional para visualizar forma de onda, espectro de frequências e detectar notas musicais usando o microfone do computador.">
+  <title>Analisador de Ondas Sonoras</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon"
+    href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='40' fill='none' stroke='%23a3e635' stroke-width='4'/><line x1='30' y1='50' x2='40' y2='30' stroke='%23a3e635' stroke-width='3'/><line x1='40' y1='30' x2='50' y2='60' stroke='%23a3e635' stroke-width='3'/><line x1='50' y1='60' x2='60' y2='40' stroke='%23a3e635' stroke-width='3'/><line x1='60' y1='40' x2='70' y2='50' stroke='%23a3e635' stroke-width='3'/></svg>">
+</head>
+
+<body>
+
+  <div class="app-container">
+
+    <!-- ===================== HEADER ===================== -->
+    <header class="app-header">
+      <div class="app-header__title">
+        <img src="logo.png" alt="SonaryA" class="app-header__logo">
+        <span id="frozen-badge" class="frozen-badge">Congelado</span>
+      </div>
+      <div class="app-header__controls">
+        <div id="mic-status" class="mic-status">
+          <span id="mic-status-dot" class="mic-status__dot"></span>
+          <span id="mic-status-text">Desligado</span>
+        </div>
+        <button id="btn-mic-start" class="btn btn--primary">Iniciar Microfone</button>
+        <button id="btn-mic-stop" class="btn btn--danger hidden">Parar Microfone</button>
+      </div>
+    </header>
+
+    <!-- ===================== ALERT BANNER ===================== -->
+    <div id="alert-banner" class="alert-banner">
+      <span id="alert-text"></span>
+    </div>
+
+    <!-- ===================== INFO CARDS ===================== -->
+    <section class="info-cards">
+
+      <!-- Card: Nota -->
+      <div class="card note-card">
+        <div class="card__header">
+          <span class="card__label">Nota</span>
+        </div>
+        <div class="card__body">
+          <div class="note-display">
+            <span id="note-name" class="note-display__name note-display__name--silent">—</span>
+            <span id="note-cents" class="note-display__cents">Ouvindo...</span>
+          </div>
+          <div class="cents-bar">
+            <div class="cents-bar__center"></div>
+            <div id="cents-bar-indicator" class="cents-bar__indicator"></div>
+            <div class="cents-bar__labels">
+              <span>-50</span>
+              <span>0</span>
+              <span>+50</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card: Frequência -->
+      <div class="card freq-card">
+        <div class="card__header">
+          <span class="card__label">Frequência</span>
+        </div>
+        <div class="card__body">
+          <div class="freq-display">
+            <div>
+              <span id="freq-value" class="freq-display__value">—</span>
+              <span class="freq-display__unit"> Hz</span>
+            </div>
+            <span id="freq-ideal" class="freq-display__ideal"></span>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ===================== FORMA DA ONDA ===================== -->
+    <div class="card canvas-card">
+      <div class="card__header">
+        <span class="card__label">Osciloscópio</span>
+      </div>
+      <div class="card__body">
+        <div class="canvas-wrap">
+          <canvas id="wave-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== ESPECTRO FFT ===================== -->
+    <div class="card canvas-card">
+      <div class="card__header">
+        <span class="card__label">Espectro de Frequências</span>
+      </div>
+      <div class="card__body">
+        <div class="canvas-wrap">
+          <canvas id="fft-canvas"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== CONTROLES ===================== -->
+    <div class="controls-bar">
+      <div class="controls-bar__group">
+        <button id="btn-freeze" class="btn btn--primary">Congelar</button>
+        <button id="btn-calibrate" class="btn">Calibrar Ambiente</button>
+      </div>
+
+      <div class="controls-bar__separator"></div>
+
+      <div class="controls-bar__group">
+        <div class="select-wrap">
+          <label for="select-sensitivity">Sensibilidade</label>
+          <select id="select-sensitivity">
+            <option value="low">Baixa</option>
+            <option value="medium" selected>Média</option>
+            <option value="high">Alta</option>
+          </select>
+        </div>
+
+        <div class="select-wrap">
+          <label for="select-accidentals">Notação</label>
+          <select id="select-accidentals">
+            <option value="sharps" selected>Sustenidos</option>
+            <option value="flats">Bemóis</option>
+          </select>
+        </div>
+
+        <div class="number-input-wrap">
+          <label for="input-a4-ref">A4</label>
+          <input type="number" id="input-a4-ref" value="440" min="400" max="500" step="1">
+          <span class="unit">Hz</span>
+        </div>
+
+        <div class="select-wrap">
+          <label for="select-fft-range">FFT</label>
+          <select id="select-fft-range">
+            <option value="1200" selected>0–1200 Hz</option>
+            <option value="2000">0–2000 Hz</option>
+            <option value="5000">0–5000 Hz</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== HISTÓRICO ===================== -->
+    <div class="card history-card">
+      <div class="card__header">
+        <span class="card__label">Histórico</span>
+        <button id="btn-clear-history" class="btn btn--small">Limpar</button>
+      </div>
+      <div class="card__body">
+        <div id="history-list" class="history-list">
+          <span class="history-empty">Nenhuma nota registrada</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===================== FOOTER ===================== -->
+    <footer class="app-footer">
+      <div class="app-footer__credit">Desenvolvido por monitores do PIBID Física UFRJ 2026 - Colégio Pedro II - Campus
+        São Cristóvão</div>
+      <div class="app-footer__school">com auxílio do Google Antigravity (Claude Opus 4.6) </div>
+    </footer>
+
+  </div>
+
+  <!-- ===================== CALIBRATION OVERLAY ===================== -->
+  <div id="calibration-overlay" class="calibration-overlay">
+    <div class="calibration-modal">
+      <div class="calibration-modal__icon">Calibração</div>
+      <div class="calibration-modal__title">Calibrando Ambiente</div>
+      <div class="calibration-modal__text">
+        Fique em silêncio por 2 segundos.<br>
+        Medindo o nível de ruído de fundo.
+      </div>
+      <div class="calibration-modal__progress">
+        <div id="calibration-progress-fill" class="calibration-modal__progress-fill"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SCRIPTS ===================== -->
+  <script src="js/audio.js"></script>
+  <script src="js/pitch.js"></script>
+  <script src="js/visualizer.js"></script>
+  <script src="js/app.js"></script>
+
+</body>
+
+</html>
