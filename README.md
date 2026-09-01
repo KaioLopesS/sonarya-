@@ -88,13 +88,4 @@ pibid_ondas_sonoras/
 ---
 
 ## Privacidade
-
 Todo o processamento de áudio é feito **localmente no navegador**. Nenhum dado é gravado ou enviado para servidores externos.
-
----
-
-## 📖 Referências
-
-- de Cheveigné, A., & Kawahara, H. (2002). *"YIN, a fundamental frequency estimator for speech and music."* JASA, 111(4), 1917-1930.
-- [Web Audio API — MDN](https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API)
-- [AnalyserNode — MDN](https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode)
