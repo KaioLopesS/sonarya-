@@ -21,20 +21,7 @@ Permitir que estudantes e professores:
 - **Comparem** amplitude vs frequência de forma visual
 - **Aprendam** sobre período, oitavas, cents e escala temperada
 
----
 
-## Tecnologias
-
-| Tecnologia | Uso |
-|---|---|
-| **HTML5** | Estrutura semântica |
-| **CSS3** | Design minimalista, responsivo |
-| **JavaScript (ES6+)** | Lógica da aplicação, arquitetura modular |
-| **Web Audio API** | Captura de áudio, `AnalyserNode`, FFT |
-| **Canvas 2D** | Visualização de waveform e espectro em tempo real |
-| **Algoritmo YIN** | Detecção de frequência fundamental de alta precisão |
-
----
 
 ## Como Funciona a Detecção de Frequência
 
