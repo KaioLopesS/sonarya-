@@ -19,8 +19,6 @@ Permitir que estudantes e professores:
 - **Identifiquem** notas musicais a partir de sons captados pelo microfone
 - **Observem** o espectro de frequências via FFT (harmônicos, fundamental)
 - **Comparem** amplitude vs frequência de forma visual
-- **Aprendam** sobre período, oitavas, cents e escala temperada
-
 
 
 ## Como Funciona a Detecção de Frequência
@@ -29,11 +27,9 @@ Permitir que estudantes e professores:
 
 O YIN é um algoritmo de detecção de frequência fundamental baseado em autocorrelação com diferença acumulada normalizada:
 
-1. **Função de diferença $d(\tau)$** — Calcula a soma das diferenças quadráticas entre amostras deslocadas por $\tau$
+1. **Função de diferença $d(\tau)$** — Calcula a soma das diferenças quadráticas entre amostras deslocadas
 2. **Normalização cumulativa (CMND)** — Normaliza para evitar favorecimento de lags pequenos
-3. **Busca de limiar** — Encontra o primeiro vale abaixo de um threshold ($\approx 0.15$)
 4. **Interpolação parabólica** — Refina a posição do mínimo para precisão sub-amostra
-5. **Conversão** — $\text{frequência} = \text{sampleRate} / \tau$
 
 #### Por que não usar apenas o pico da FFT?
 
@@ -49,14 +45,11 @@ A FFT (*Fast Fourier Transform*) decompõe o sinal nas suas componentes de frequ
 - Destaca a fundamental detectada com uma linha de referência
 - Mostra os harmônicos distribuídos ao longo do espectro
 
----
-
 ## Calibração de Ruído
 
 1. Clique em **"Calibrar Ambiente"**
 2. Fique em silêncio por 2 segundos
 3. A aplicação mede o nível de ruído de fundo
-4. Após a calibração, o threshold de detecção se ajusta automaticamente ao ambiente da sala
 
 ---
 
