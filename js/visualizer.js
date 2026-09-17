@@ -305,8 +305,6 @@ class AudioVisualizer {
         displayBins, drawWidth, drawHeight, marginLeft, buffer, minDb, maxDb);
     }
 
-    // Labels de frequência no eixo X
-    this._drawFFTLabels(ctx, width, height, drawHeight, sampleRate, displayBins, marginLeft, drawWidth);
   }
 
   /**
@@ -359,12 +357,6 @@ class AudioVisualizer {
     ctx.setLineDash([]);
     ctx.globalAlpha = 1;
 
-    // Label da frequência
-    ctx.fillStyle = this.fundamentalColor;
-    ctx.font = '10px "JetBrains Mono", monospace';
-    ctx.textAlign = 'center';
-    ctx.fillText(`${Math.round(freq)} Hz`, x, 12);
-
     // Marcadores de harmônicos (2x, 3x, 4x)
     ctx.globalAlpha = 0.35;
     for (let h = 2; h <= 4; h++) {
@@ -383,31 +375,6 @@ class AudioVisualizer {
       ctx.setLineDash([]);
     }
     ctx.globalAlpha = 1;
-  }
-
-  /**
-   * Desenha os labels de frequência no eixo X.
-   * @private
-   */
-  _drawFFTLabels(ctx, width, height, drawHeight, sampleRate, displayBins, marginLeft, drawWidth) {
-    const nyquist = sampleRate / 2;
-    const binCount = displayBins * (nyquist / this.fftMaxFreq);
-
-    ctx.fillStyle = this.textColor;
-    ctx.font = '9px "JetBrains Mono", monospace';
-    ctx.textAlign = 'center';
-
-    // Frequências de referência para label
-    const labelFreqs = [100, 200, 300, 400, 500, 600, 800, 1000];
-
-    for (const f of labelFreqs) {
-      if (f > this.fftMaxFreq) break;
-      const x = marginLeft + (f / this.fftMaxFreq) * drawWidth;
-      ctx.fillText(`${f}`, x, height - 4);
-    }
-
-    // Label "Hz" no final
-    ctx.fillText('Hz', width - 14, height - 4);
   }
 
   // ================================================================

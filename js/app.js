@@ -10,7 +10,7 @@
  *   2. Calcular RMS / peak / clipping
  *   3. Detectar pitch (YIN)
  *   4. Suavizar e converter nota
- *   5. Atualizar DOM (nota, frequência, cents, nível, alertas)
+ *   5. Atualizar a interface e os alertas
  *   6. Renderizar canvas (waveform + FFT)
  * ============================================================
  */
@@ -29,7 +29,7 @@ class App {
     this.animationFrameId = null;
 
     // ---- Histórico ----
-    /** @type {{ note: string, freq: number }[]} */
+    /** @type {{ note: string }[]} */
     this.noteHistory = [];
     this.maxHistory = 10;
     this.lastHistoryNote = null;
@@ -85,10 +85,6 @@ class App {
       noteCents: document.getElementById('note-cents'),
       centsBarIndicator: document.getElementById('cents-bar-indicator'),
 
-      // Frequency card
-      freqValue: document.getElementById('freq-value'),
-      freqIdeal: document.getElementById('freq-ideal'),
-
       // Canvas
       waveCanvas: document.getElementById('wave-canvas'),
       fftCanvas: document.getElementById('fft-canvas'),
@@ -103,8 +99,6 @@ class App {
       // Settings
       selectSensitivity: document.getElementById('select-sensitivity'),
       selectAccidentals: document.getElementById('select-accidentals'),
-      inputA4Ref: document.getElementById('input-a4-ref'),
-      selectFftRange: document.getElementById('select-fft-range'),
 
       // Frozen badge
       frozenBadge: document.getElementById('frozen-badge'),
@@ -170,20 +164,6 @@ class App {
       this.pitch.setAccidentalMode(e.target.value);
     });
 
-    // A4 referência
-    this.dom.inputA4Ref.addEventListener('change', (e) => {
-      const val = parseFloat(e.target.value);
-      if (val >= 400 && val <= 500) {
-        this.pitch.setReferenceA4(val);
-      } else {
-        e.target.value = this.pitch.referenceA4;
-      }
-    });
-
-    // Faixa FFT
-    this.dom.selectFftRange.addEventListener('change', (e) => {
-      this.visualizer.setFFTMaxFreq(parseInt(e.target.value));
-    });
   }
 
   // ================================================================
@@ -317,26 +297,19 @@ class App {
    * @private
    */
   _updateNoteDisplay(processedNote) {
-    const { note, frequency } = processedNote;
+    const { note } = processedNote;
 
-    // Nome da nota
+    // Nome da nota com a indicação da oitava (ex.: Lá4, Dó5)
     this.dom.noteName.textContent = note.fullName;
     this.dom.noteName.className = 'note-display__name';
 
-    // Frequência medida
-    this.dom.freqValue.textContent = frequency.toFixed(1);
-
-    // Frequência ideal
-    this.dom.freqIdeal.textContent = `ideal: ${note.idealFrequency} Hz`;
-
-    // Cents
+    // Os valores de afinação permanecem ocultos na atividade investigativa.
     const cents = note.cents;
-    const centsText = cents > 0 ? `+${cents}` : `${cents}`;
-    this.dom.noteCents.textContent = `${centsText} cents`;
 
     // Classe de cor dos cents
     let centsClass = 'note-display__cents';
     let barClass = 'cents-bar__indicator';
+    this.dom.noteCents.textContent = '';
     if (Math.abs(cents) <= 5) {
       centsClass += ' note-display__cents--tuned';
       barClass += ' cents-bar__indicator--tuned';
@@ -365,8 +338,6 @@ class App {
     this.dom.noteName.className = 'note-display__name note-display__name--silent';
     this.dom.noteCents.textContent = 'Ouvindo...';
     this.dom.noteCents.className = 'note-display__cents';
-    this.dom.freqValue.textContent = '—';
-    this.dom.freqIdeal.textContent = '';
     this.dom.centsBarIndicator.style.left = '50%';
     this.dom.centsBarIndicator.className = 'cents-bar__indicator';
   }
@@ -496,7 +467,7 @@ class App {
     // Ocultar overlay
     this.dom.calibrationOverlay.classList.remove('calibration-overlay--visible');
 
-    this._showAlert(`Calibração concluída — ruído de fundo: ${(avgRMS * 1000).toFixed(1)} mRMS`, 'success');
+    this._showAlert('Calibração concluída.', 'success');
 
     // Auto-ocultar alerta após 3s
     setTimeout(() => this._hideAlert(), 3000);
@@ -511,15 +482,14 @@ class App {
    * @private
    */
   _updateHistoryIfChanged(processedNote) {
-    const fullName = processedNote.note.fullName;
+    const noteName = processedNote.note.fullName;
 
-    if (fullName === this.lastHistoryNote) return;
+    if (noteName === this.lastHistoryNote) return;
 
-    this.lastHistoryNote = fullName;
+    this.lastHistoryNote = noteName;
 
     this.noteHistory.push({
-      note: fullName,
-      freq: processedNote.frequency
+      note: noteName
     });
 
     if (this.noteHistory.length > this.maxHistory) {
@@ -544,7 +514,6 @@ class App {
       html += `
         <div class="history-item">
           <span class="history-item__note">${item.note}</span>
-          <span class="history-item__freq">${item.freq.toFixed(0)} Hz</span>
         </div>
       `;
     }
