@@ -55,7 +55,7 @@ class PitchDetector {
       medium: { rmsThreshold: 0.010, yinThreshold: 0.15, stabilityFrames: 3 },
       high:   { rmsThreshold: 0.005, yinThreshold: 0.20, stabilityFrames: 2 }
     };
-    this.sensitivity = 'medium';
+    this.sensitivity = 'low';
 
     // ---- Suavização temporal ----
     this.historySize = 5;           // Janela de mediana
