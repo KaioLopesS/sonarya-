@@ -30,7 +30,6 @@ class PitchDetector {
     // ---- Referência de afinação ----
     this.referenceA4 = 440;         // Hz — configurável pelo usuário
 
-    // ---- Nomes das notas (pt-BR) ----
     this.noteNamesSharps = [
       'Dó', 'Dó#', 'Ré', 'Ré#', 'Mi', 'Fá',
       'Fá#', 'Sol', 'Sol#', 'Lá', 'Lá#', 'Si'
@@ -41,25 +40,20 @@ class PitchDetector {
       'Solb', 'Sol', 'Láb', 'Lá', 'Sib', 'Si'
     ];
 
-    /** @type {'sharps'|'flats'} */
     this.accidentalMode = 'sharps';
 
-    // ---- Gate de ruído ----
-    this.noiseFloor = 0.008;        // RMS mínimo padrão
-    this.calibratedNoise = null;    // Nível após calibração
+    this.noiseFloor = 0.008;        
+    this.calibratedNoise = null;    
 
-    // ---- Sensibilidade ----
-    // Presets: { rmsThreshold, yinThreshold, stabilityFrames }
     this.sensitivityPresets = {
       low:    { rmsThreshold: 0.020, yinThreshold: 0.10, stabilityFrames: 5 },
       medium: { rmsThreshold: 0.010, yinThreshold: 0.15, stabilityFrames: 3 },
       high:   { rmsThreshold: 0.005, yinThreshold: 0.20, stabilityFrames: 2 }
     };
     this.sensitivity = 'low';
+    
+    this.historySize = 5;          
 
-    // ---- Suavização temporal ----
-    this.historySize = 5;           // Janela de mediana
-    /** @type {number[]} */
     this.frequencyHistory = [];
 
     // ---- Estabilidade ----
